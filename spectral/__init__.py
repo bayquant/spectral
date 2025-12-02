@@ -1,8 +1,12 @@
-from .charts.charts import BokehAccessor
-from . import polars_quant_expressions
-from . import portfolio
+# Load environment variables
+from pathlib import Path
+from dotenv import load_dotenv
 
-__all__ = [
-    'polars_quant_expressions',
-    'portfolio'
-]
+load_dotenv(
+    dotenv_path=Path(__file__).resolve().parent / ".env"
+)
+
+from .polars_quant_expressions import *
+from . import data
+from . import charts
+

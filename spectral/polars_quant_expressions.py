@@ -23,6 +23,22 @@ class QuantNamespace:
         expr = (self._expr / self._expr.shift(n=periods)) - 1
         return expr.over(over).alias('return') if over is not None else expr.alias('return')
 
+    def compound(
+        self,
+        over: str | None = None,
+    ) -> pl.Expr:
+        """
+        Compound an existing series.
+
+        Parameters
+        ----------
+        over : str | None
+            Optional grouping column (e.g. 'ticker'). If None, compound over the full series.
+        """
+        expr = (1 + self._expr).cum_prod().sub(1)
+
+        return expr.over(over).alias(f"compounded") if over is not None else expr.alias(f"compounded")
+
     def rolling_vol(
         self,
         window_size: int,
@@ -62,7 +78,7 @@ class QuantNamespace:
 
     def rolling_beta(
         self,
-        benchmark: pl.Expr,
+        benchmark_col: pl.Expr,
         window_size: int,
         min_periods: int | None = None,
         ddof: int = 1,
@@ -92,12 +108,12 @@ class QuantNamespace:
         expr = (
             pl.rolling_cov(
                 a=self._expr,
-                b=benchmark,
+                b=benchmark_col,
                 window_size=window_size,
                 min_periods=min_periods,
                 ddof=ddof
             ) 
-            / benchmark.rolling_var(
+            / benchmark_col.rolling_var(
                 window_size=window_size,
                 min_periods=min_periods,
                 ddof=ddof
