@@ -36,7 +36,7 @@ class Portfolio:
 
         _weights_df = (
             pl.DataFrame({'ticker': list(portfolio.keys()), 'weight': list(portfolio.values())})
-        )
+        ).lazy()
         self.assets_df = self.assets_df.join(other=_weights_df, on='ticker', how='inner')
 
     def compute_returns(self) -> pl.DataFrame:
@@ -44,25 +44,20 @@ class Portfolio:
         df = self.assets_df.join(self.benchmark_df, on='timestamp', how='inner')
 
         df = df.with_columns([
-            (pl.col('return') * pl.col('weight')).alias('weighted_return'),
-            (pl.col('rolling_beta') * pl.col('weight')).alias('weighted_beta')
+            (pl.col('systematic_return') * pl.col('weight')).alias('port_systematic_return'),
+            (pl.col('idio_return') * pl.col('weight')).alias('port_idio_return'),
+            (pl.col('return') * pl.col('weight')).alias('port_total_return')
         ])
 
         portfolio = (
             df.group_by('timestamp')
             .agg([
-                pl.sum('weighted_return').alias('portfolio_return'),
-                pl.sum('weighted_beta').alias('portfolio_beta'),
+                pl.sum('port_systematic_return').alias('systematic_return'),
+                pl.sum('port_idio_return').alias('idio_return'),
+                pl.sum('port_total_return').alias('return'),
                 pl.first('benchmark_return')
-            ])
-            .with_columns([
-                (pl.col('portfolio_beta') * pl.col('benchmark_return')).alias('systematic_return'),
-            ])
-            .with_columns([
-                (pl.col('portfolio_return') - pl.col('systematic_return')).alias('idiosyncratic_return'),
             ])
             .sort('timestamp')
         )
-
 
         return portfolio
