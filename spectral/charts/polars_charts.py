@@ -71,13 +71,12 @@ class LineGlyphChart(BasePolarsChart):
 
     def add_glyphs(self, figure):
         _, glyph_kwargs = self._split_kwargs()
+        print(glyph_kwargs)
         for col in self.y:
             figure.line(
                 x=self.x,
                 y=col,
                 source=self._df,
-                name=str(col),
-                legend_label=str(col),
                 **glyph_kwargs,
             )
 
