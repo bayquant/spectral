@@ -1,3 +1,5 @@
+"""Polars DataFrame -> Bokeh chart helpers."""
+
 import polars as pl
 from bokeh.models.glyphs import Line
 from bokeh.plotting import figure
@@ -6,6 +8,7 @@ from bokeh.plotting import figure
 # TODO: handle name and legend_label the right way
 
 class BasePolarsChart:
+    """Base class for building Bokeh charts from a Polars DataFrame."""
     glyph_model = None
 
     def __init__(
@@ -32,6 +35,7 @@ class BasePolarsChart:
         return list(y)
 
     def prepare_data(self) -> pl.DataFrame:
+        """Validate inputs and ensure required columns exist."""
         if self.x is None:
             self.x = "__index"
         if self.x not in self._df.columns:
@@ -43,6 +47,10 @@ class BasePolarsChart:
             self.y = [col for col in self._df.columns if col != self.x]
         if not self.y:
             raise ValueError("No y columns to plot.")
+        missing_y = [col for col in self.y if col not in self._df.columns]
+        if missing_y:
+            missing = ", ".join(missing_y)
+            raise ValueError(f"y column(s) not found in DataFrame: {missing}")
         return self._df
 
     def build_figure(self):
@@ -60,6 +68,7 @@ class BasePolarsChart:
         raise NotImplementedError
 
     def build(self):
+        """Prepare data, build the figure, and add glyphs."""
         self.prepare_data()
         figure = self.build_figure()
         self.add_glyphs(figure)
@@ -67,11 +76,11 @@ class BasePolarsChart:
 
 
 class LineGlyphChart(BasePolarsChart):
+    """Line chart for one or more y columns."""
     glyph_model = Line
 
     def add_glyphs(self, figure):
         _, glyph_kwargs = self._split_kwargs()
-        print(glyph_kwargs)
         for col in self.y:
             figure.line(
                 x=self.x,
@@ -93,6 +102,7 @@ class BokehAccessor:
         figure=None,
         **kwargs,
     ):
+        """Create a Bokeh line chart from the Polars DataFrame."""
         chart = LineGlyphChart(
             self._df,
             x=x,
