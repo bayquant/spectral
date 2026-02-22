@@ -28,6 +28,7 @@ class BasePolarsChart:
         
     @staticmethod
     def _normalize_y(y: str | list[str] | None) -> list[str]:
+        """Normalize `y` into a list of column names."""
         if y is None:
             return []
         if isinstance(y, str):
@@ -54,10 +55,12 @@ class BasePolarsChart:
         return self._df
 
     def build_figure(self):
+        """Create a new Bokeh figure from figure kwargs unless one is provided."""
         figure_kwargs, _ = self._split_kwargs()
         return self._figure or figure(**figure_kwargs)
 
     def _split_kwargs(self):
+        """Split kwargs into figure-level and glyph-level keyword arguments."""
         figure_props = set(figure().properties())
         glyph_props = set(self.glyph_model.properties()) if self.glyph_model else set()
         figure_kwargs = {k: v for k, v in self._kwargs.items() if k in figure_props}
