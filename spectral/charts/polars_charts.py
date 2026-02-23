@@ -1,6 +1,9 @@
 """Polars DataFrame -> Bokeh chart helpers."""
 
+from typing import ClassVar
+
 import polars as pl
+from bokeh.models import glyphs
 from bokeh.models.glyphs import Line
 from bokeh.plotting import figure
 
@@ -9,7 +12,7 @@ from bokeh.plotting import figure
 
 class BasePolarsChart:
     """Base class for building Bokeh charts from a Polars DataFrame."""
-    glyph_model = None
+    glyph_model: ClassVar[type[glyphs.Glyph] | None] = None
 
     def __init__(
         self,
@@ -35,6 +38,14 @@ class BasePolarsChart:
             return [y]
         return list(y)
 
+    def _split_kwargs(self):
+        """Split kwargs into figure-level and glyph-level keyword arguments."""
+        figure_props = set(figure().properties())
+        glyph_props = set(self.glyph_model.properties()) if self.glyph_model else set()
+        figure_kwargs = {k: v for k, v in self._kwargs.items() if k in figure_props}
+        glyph_kwargs = {k: v for k, v in self._kwargs.items() if k in glyph_props}
+        return figure_kwargs, glyph_kwargs
+    
     def prepare_data(self) -> pl.DataFrame:
         """Validate inputs and ensure required columns exist."""
         if self.x is None:
@@ -54,20 +65,12 @@ class BasePolarsChart:
             raise ValueError(f"y column(s) not found in DataFrame: {missing}")
         return self._df
 
-    def build_figure(self):
+    def build_figure(self) -> figure:
         """Create a new Bokeh figure from figure kwargs unless one is provided."""
         figure_kwargs, _ = self._split_kwargs()
         return self._figure or figure(**figure_kwargs)
 
-    def _split_kwargs(self):
-        """Split kwargs into figure-level and glyph-level keyword arguments."""
-        figure_props = set(figure().properties())
-        glyph_props = set(self.glyph_model.properties()) if self.glyph_model else set()
-        figure_kwargs = {k: v for k, v in self._kwargs.items() if k in figure_props}
-        glyph_kwargs = {k: v for k, v in self._kwargs.items() if k in glyph_props}
-        return figure_kwargs, glyph_kwargs
-
-    def add_glyphs(self, figure):
+    def add_glyphs(self, figure: figure) -> None:
         raise NotImplementedError
 
     def build(self):
@@ -80,9 +83,9 @@ class BasePolarsChart:
 
 class LineGlyphChart(BasePolarsChart):
     """Line chart for one or more y columns."""
-    glyph_model = Line
+    glyph_model: ClassVar[type[glyphs.Line]] = Line
 
-    def add_glyphs(self, figure):
+    def add_glyphs(self, figure: figure) -> None:
         _, glyph_kwargs = self._split_kwargs()
         for col in self.y:
             figure.line(
