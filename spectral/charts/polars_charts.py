@@ -125,6 +125,9 @@ class LineGlyphChart(BasePolarsChart):
 class BokehAccessor:
     def __init__(self, df: pl.DataFrame):
         self._df = df
+        self._chart_registry: dict[str, type[BasePolarsChart]] = {
+            "line": LineGlyphChart,
+        }
 
     def line(
         self,
@@ -135,7 +138,8 @@ class BokehAccessor:
         glyph_kwargs: dict[str, Any] | None = None,
     ):
         """Create a Bokeh line chart from the Polars DataFrame."""
-        chart = LineGlyphChart(
+        chart_cls = self._chart_registry["line"]
+        chart = chart_cls(
             self._df,
             x=x,
             y=y,
@@ -149,6 +153,10 @@ class BokehAccessor:
         """Return accepted Bokeh figure property names for `figure_kwargs`."""
         return BasePolarsChart.accepted_figure_kwargs()
 
-    def accepted_glyph_kwargs(self) -> set[str]:
-        """Return accepted Bokeh line glyph property names for `glyph_kwargs`."""
-        return LineGlyphChart.accepted_glyph_kwargs()
+    def accepted_glyph_kwargs(self, *, method: str = "line") -> set[str]:
+        """Return accepted Bokeh glyph property names for a given chart method."""
+        chart_cls = self._chart_registry.get(method)
+        if chart_cls is None:
+            available = ", ".join(sorted(self._chart_registry))
+            raise ValueError(f"Unknown method '{method}'. Available methods: {available}")
+        return chart_cls.accepted_glyph_kwargs()
