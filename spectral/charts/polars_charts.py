@@ -1,6 +1,6 @@
 """Polars DataFrame -> Bokeh chart helpers."""
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 import polars as pl
 from bokeh.models import glyphs
@@ -21,8 +21,8 @@ class BasePolarsChart:
         x: str | None = None,
         y: list[str] | None = None,
         figure=None,
-        figure_kwargs: dict | None = None,
-        glyph_kwargs: dict | None = None,
+        figure_kwargs: dict[str, Any] | None = None,
+        glyph_kwargs: dict[str, Any] | None = None,
     ):
         self._df = df
         self.x = x
@@ -30,6 +30,16 @@ class BasePolarsChart:
         self._figure = figure
         self._figure_kwargs = figure_kwargs or {}
         self._glyph_kwargs = glyph_kwargs or {}
+        self._validate_kwargs(
+            name="figure_kwargs",
+            values=self._figure_kwargs,
+            accepted=self.accepted_figure_kwargs(),
+        )
+        self._validate_kwargs(
+            name="glyph_kwargs",
+            values=self._glyph_kwargs,
+            accepted=self.accepted_glyph_kwargs(),
+        )
         
     @staticmethod
     def _normalize_list(values: str | list[str] | None) -> list[str]:
@@ -39,6 +49,29 @@ class BasePolarsChart:
         if isinstance(values, str):
             return [values]
         return list(values)
+
+    @staticmethod
+    def _validate_kwargs(name: str, values: dict[str, Any], accepted: set[str]) -> None:
+        unknown = sorted(set(values) - accepted)
+        if not unknown:
+            return
+        unknown_text = ", ".join(unknown)
+        raise ValueError(
+            f"Unsupported {name}: {unknown_text}. "
+            f"Use `.accepted_figure_kwargs()` and `.accepted_glyph_kwargs()` to inspect valid keys."
+        )
+
+    @staticmethod
+    def accepted_figure_kwargs() -> set[str]:
+        """Get accepted kwargs for bokeh.plotting.figure()."""
+        return set(figure().properties())
+
+    @classmethod
+    def accepted_glyph_kwargs(cls) -> set[str]:
+        """Get accepted kwargs for the active glyph model."""
+        if cls.glyph_model is None:
+            return set()
+        return set(cls.glyph_model.properties())
 
     def prepare_data(self) -> pl.DataFrame:
         """Validate inputs and ensure required columns exist."""
@@ -98,8 +131,8 @@ class BokehAccessor:
         x: str | None = None,
         y: str | list[str] | None = None,
         figure=None,
-        figure_kwargs: dict | None = None,
-        glyph_kwargs: dict | None = None,
+        figure_kwargs: dict[str, Any] | None = None,
+        glyph_kwargs: dict[str, Any] | None = None,
     ):
         """Create a Bokeh line chart from the Polars DataFrame."""
         chart = LineGlyphChart(
@@ -111,3 +144,11 @@ class BokehAccessor:
             glyph_kwargs=glyph_kwargs,
         )
         return chart.build()
+
+    def accepted_figure_kwargs(self) -> set[str]:
+        """Return accepted Bokeh figure property names for `figure_kwargs`."""
+        return BasePolarsChart.accepted_figure_kwargs()
+
+    def accepted_glyph_kwargs(self) -> set[str]:
+        """Return accepted Bokeh line glyph property names for `glyph_kwargs`."""
+        return LineGlyphChart.accepted_glyph_kwargs()
