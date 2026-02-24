@@ -21,31 +21,25 @@ class BasePolarsChart:
         x: str | None = None,
         y: list[str] | None = None,
         figure=None,
-        **kwargs,
+        figure_kwargs: dict | None = None,
+        glyph_kwargs: dict | None = None,
     ):
         self._df = df
         self.x = x
-        self.y = self._normalize_y(y)
+        self.y = self._normalize_list(y)
         self._figure = figure
-        self._kwargs = kwargs
+        self._figure_kwargs = figure_kwargs or {}
+        self._glyph_kwargs = glyph_kwargs or {}
         
     @staticmethod
-    def _normalize_y(y: str | list[str] | None) -> list[str]:
-        """Normalize `y` into a list of column names."""
-        if y is None:
+    def _normalize_list(values: str | list[str] | None) -> list[str]:
+        """Normalize a str/list/None input into a list of strings."""
+        if values is None:
             return []
-        if isinstance(y, str):
-            return [y]
-        return list(y)
+        if isinstance(values, str):
+            return [values]
+        return list(values)
 
-    def _split_kwargs(self):
-        """Split kwargs into figure-level and glyph-level keyword arguments."""
-        figure_props = set(figure().properties())
-        glyph_props = set(self.glyph_model.properties()) if self.glyph_model else set()
-        figure_kwargs = {k: v for k, v in self._kwargs.items() if k in figure_props}
-        glyph_kwargs = {k: v for k, v in self._kwargs.items() if k in glyph_props}
-        return figure_kwargs, glyph_kwargs
-    
     def prepare_data(self) -> pl.DataFrame:
         """Validate inputs and ensure required columns exist."""
         if self.x is None:
@@ -67,8 +61,7 @@ class BasePolarsChart:
 
     def build_figure(self) -> figure:
         """Create a new Bokeh figure from figure kwargs unless one is provided."""
-        figure_kwargs, _ = self._split_kwargs()
-        return self._figure or figure(**figure_kwargs)
+        return self._figure or figure(**self._figure_kwargs)
 
     def add_glyphs(self, figure: figure) -> None:
         raise NotImplementedError
@@ -86,13 +79,12 @@ class LineGlyphChart(BasePolarsChart):
     glyph_model: ClassVar[type[glyphs.Line]] = Line
 
     def add_glyphs(self, figure: figure) -> None:
-        _, glyph_kwargs = self._split_kwargs()
         for col in self.y:
             figure.line(
                 x=self.x,
                 y=col,
                 source=self._df,
-                **glyph_kwargs,
+                **self._glyph_kwargs,
             )
 
 
@@ -106,7 +98,8 @@ class BokehAccessor:
         x: str | None = None,
         y: str | list[str] | None = None,
         figure=None,
-        **kwargs,
+        figure_kwargs: dict | None = None,
+        glyph_kwargs: dict | None = None,
     ):
         """Create a Bokeh line chart from the Polars DataFrame."""
         chart = LineGlyphChart(
@@ -114,6 +107,7 @@ class BokehAccessor:
             x=x,
             y=y,
             figure=figure,
-            **kwargs,
+            figure_kwargs=figure_kwargs,
+            glyph_kwargs=glyph_kwargs,
         )
         return chart.build()
