@@ -94,8 +94,12 @@ class BasePolarsChart:
         return self._df
 
     def build_figure(self) -> figure:
-        """Create a new Bokeh figure from figure kwargs unless one is provided."""
-        return self._figure or figure(**self._figure_kwargs)
+        """Return the target figure, applying figure kwargs to existing figures too."""
+        if self._figure is not None:
+            if self._figure_kwargs:
+                self._figure.update(**self._figure_kwargs)
+            return self._figure
+        return figure(**self._figure_kwargs)
 
     def add_glyphs(self, figure: figure) -> None:
         raise NotImplementedError
