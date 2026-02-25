@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 import polars as pl
 from bokeh.models import glyphs
 from bokeh.models.glyphs import Line
+from bokeh.models.glyphs import Scatter
 from bokeh.plotting import figure
 
 # TODO: add colors parameter with cycler
@@ -121,12 +122,27 @@ class LineGlyphChart(BasePolarsChart):
             )
 
 
+class ScatterGlyphChart(BasePolarsChart):
+    """Scatter chart for one or more y columns."""
+    glyph_model: ClassVar[type[glyphs.Scatter]] = Scatter
+
+    def add_glyphs(self, figure: figure) -> None:
+        for col in self.y:
+            figure.scatter(
+                x=self.x,
+                y=col,
+                source=self._df,
+                **self._glyph_kwargs,
+            )
+
+
 @pl.api.register_dataframe_namespace("bokeh")
 class BokehAccessor:
     def __init__(self, df: pl.DataFrame):
         self._df = df
         self._chart_registry: dict[str, type[BasePolarsChart]] = {
             "line": LineGlyphChart,
+            "scatter": ScatterGlyphChart, 
         }
 
     def line(
@@ -139,6 +155,26 @@ class BokehAccessor:
     ):
         """Create a Bokeh line chart from the Polars DataFrame."""
         chart_cls = self._chart_registry["line"]
+        chart = chart_cls(
+            self._df,
+            x=x,
+            y=y,
+            figure=figure,
+            figure_kwargs=figure_kwargs,
+            glyph_kwargs=glyph_kwargs,
+        )
+        return chart.build()
+    
+    def scatter(
+        self,
+        x: str | None = None,
+        y: str | list[str] | None = None,
+        figure=None,
+        figure_kwargs: dict[str, Any] | None = None,
+        glyph_kwargs: dict[str, Any] | None = None,
+    ):
+        """Create a Bokeh scatter chart from the Polars DataFrame."""
+        chart_cls = self._chart_registry["scatter"]
         chart = chart_cls(
             self._df,
             x=x,
