@@ -122,6 +122,7 @@ class LineGlyphChart(BasePolarsChart):
                 x=self.x,
                 y=col,
                 source=self._df,
+                legend_label=col,
                 **self._glyph_kwargs,
             )
 
@@ -136,6 +137,7 @@ class ScatterGlyphChart(BasePolarsChart):
                 x=self.x,
                 y=col,
                 source=self._df,
+                legend_label=col,
                 **self._glyph_kwargs,
             )
 
