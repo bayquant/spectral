@@ -9,7 +9,7 @@ description = "Quant Research Library"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "bokeh>=3.8.1",
+    "bokeh==3.8.1",
     "massive>=2.0.2",
     "matplotlib>=3.10.7",
     "pandas>=2.3.3",
