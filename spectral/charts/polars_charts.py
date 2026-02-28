@@ -130,6 +130,7 @@ class BasePolarsChart:
             }
             getattr(figure, self.glyph_spec.method)(
                 source=self._df,
+                legend_label=series_col or "",
                 **glyph_args,
                 **self._glyph_kwargs,
             )
