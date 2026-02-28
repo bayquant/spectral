@@ -10,9 +10,6 @@ from bokeh.models.glyphs import Scatter
 from bokeh.models.glyphs import VArea
 from bokeh.plotting import figure
 
-# TODO: add colors parameter with cycler
-# TODO: handle name and legend_label the right way
-
 
 @dataclass(frozen=True)
 class GlyphSpec:
@@ -179,14 +176,20 @@ class BokehAccessor:
         )
         return chart.build()
 
-    def accepted_figure_kwargs(self) -> set[str]:
+    def accepted_figure_kwargs(self, pattern: str = "") -> set[str]:
         """Return accepted Bokeh figure property names for `figure_kwargs`."""
-        return BasePolarsChart.accepted_figure_kwargs()
+        kwargs = BasePolarsChart.accepted_figure_kwargs()
+        if pattern:
+            return {arg for arg in kwargs if pattern in arg}
+        return kwargs
 
-    def accepted_glyph_kwargs(self, *, method: str) -> set[str]:
+    def accepted_glyph_kwargs(self, *, method: str, pattern: str = "") -> set[str]:
         """Return accepted Bokeh glyph property names for a given chart method."""
         glyph_spec = self._glyph_registry.get(method)
         if glyph_spec is None:
             available = ", ".join(sorted(self._glyph_registry))
             raise ValueError(f"Unknown method '{method}'. Available methods: {available}")
-        return set(glyph_spec.model.properties())
+        kwargs = set(glyph_spec.model.properties())
+        if pattern:
+            return {arg for arg in kwargs if pattern in arg}
+        return kwargs
