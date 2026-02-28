@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import polars as pl
-from bokeh.models import glyphs
+from bokeh.models import glyph
 from bokeh.models.glyphs import Line
 from bokeh.models.glyphs import Scatter
 from bokeh.models.glyphs import VArea
@@ -17,7 +17,7 @@ from bokeh.plotting import figure
 @dataclass(frozen=True)
 class GlyphSpec:
     method: str
-    model: type[glyphs.Glyph]
+    model: type[glyph.Glyph]
     required: tuple[str, ...]
     multi: frozenset[str] = frozenset()
 
