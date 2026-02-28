@@ -68,7 +68,9 @@ class BasePolarsChart:
             return []
         if isinstance(values, str):
             return [values]
-        return list(values)
+        if isinstance(values, list):
+            return list(values)
+        return [values]
 
     @staticmethod
     def _validate_kwargs(name: str, values: dict[str, Any], accepted: set[str]) -> None:
