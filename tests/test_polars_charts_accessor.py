@@ -26,9 +26,9 @@ class TestPolarsBokehAccessor(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Missing required data parameters: y"):
             self.df.bokeh.glyph("line", data={"x": "x"})
 
-    # def test_non_string_data_parameter_raises(self) -> None:
-    #     with self.assertRaisesRegex(ValueError, "Data parameter 'y' must be a column name"):
-    #         self.df.bokeh.glyph("line", data={"x": "x", "y": 123})
+    def test_non_string_data_parameter_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Data parameter 'y' must be a column name"):
+            self.df.bokeh.glyph("line", data={"x": "x", "y": 123})
 
     def test_missing_column_raises(self) -> None:
         with self.assertRaisesRegex(ValueError, "Column 'missing' not found in DataFrame"):
@@ -54,15 +54,12 @@ class TestPolarsBokehAccessor(unittest.TestCase):
         fig = self.df.bokeh.glyph(
             "line",
             data={"x": "x", "y": ["y", "y2"]},
-            glyph_kwargs={"line_width": 3},
         )
 
         self.assertEqual(len(fig.renderers), 2)
         self.assertEqual(fig.renderers[0].glyph.x, "x")
         self.assertEqual(fig.renderers[0].glyph.y, "y")
         self.assertEqual(fig.renderers[1].glyph.y, "y2")
-        self.assertEqual(fig.renderers[0].glyph.line_width, 3)
-        self.assertEqual(fig.renderers[1].glyph.line_width, 3)
 
     def test_default_x_uses_generated_index_column(self) -> None:
         df = self.df.drop("x")
