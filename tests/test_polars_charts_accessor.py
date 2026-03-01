@@ -18,52 +18,25 @@ class TestPolarsBokehAccessor(unittest.TestCase):
             }
         )
 
-    def test_unknown_glyph_method_raises(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Unknown method 'area'"):
-            self.df.bokeh.glyph("area", data={"x": "x", "y": "y"})
+    def test_unknown_glyph_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Unknown glyph 'area'"):
+            self.df.bokeh.plot("area", glyph_params={"x": "x", "y": "y"})
 
-    def test_missing_required_data_raises(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Missing required data parameters: y"):
-            self.df.bokeh.glyph("line", data={"x": "x"})
+    def test_missing_column_fails_through_bokeh_validation(self) -> None:
+        with self.assertRaisesRegex(Exception, "missing"):
+            self.df.bokeh.plot("line", glyph_params={"x": "x", "y": "missing"})
 
-    # def test_non_string_data_parameter_raises(self) -> None:
-    #     with self.assertRaisesRegex(ValueError, "Data parameter 'y' must be a column name"):
-    #         self.df.bokeh.glyph("line", data={"x": "x", "y": 123})
-
-    def test_missing_column_raises(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Column 'missing' not found in DataFrame"):
-            self.df.bokeh.glyph("line", data={"x": "x", "y": "missing"})
-
-    def test_unsupported_figure_kwarg_raises(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Unsupported figure_kwargs: not_a_figure_prop"):
-            self.df.bokeh.glyph(
+    def test_unsupported_figure_param_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Unsupported figure_params: not_a_figure_prop"):
+            self.df.bokeh.plot(
                 "line",
-                data={"x": "x", "y": "y"},
-                figure_kwargs={"not_a_figure_prop": 1},
+                glyph_params={"x": "x", "y": "y"},
+                figure_params={"not_a_figure_prop": 1},
             )
-
-    def test_unsupported_glyph_kwarg_raises(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Unsupported glyph_kwargs: not_a_line_prop"):
-            self.df.bokeh.glyph(
-                "line",
-                data={"x": "x", "y": "y"},
-                glyph_kwargs={"not_a_line_prop": 1},
-            )
-
-    def test_line_with_multiple_y_builds_multiple_renderers(self) -> None:
-        fig = self.df.bokeh.glyph(
-            "line",
-            data={"x": "x", "y": ["y", "y2"]},
-        )
-
-        self.assertEqual(len(fig.renderers), 2)
-        self.assertEqual(fig.renderers[0].glyph.x, "x")
-        self.assertEqual(fig.renderers[0].glyph.y, "y")
-        self.assertEqual(fig.renderers[1].glyph.y, "y2")
 
     def test_default_x_uses_generated_index_column(self) -> None:
         df = self.df.drop("x")
-        fig = df.bokeh.glyph("line", data={"y": "y"})
+        fig = df.bokeh.plot("line", glyph_params={"y": "y"})
 
         self.assertEqual(fig.renderers[0].glyph.x, "__index")
         self.assertIn("__index", fig.renderers[0].data_source.column_names)
@@ -71,36 +44,27 @@ class TestPolarsBokehAccessor(unittest.TestCase):
 
     def test_existing_figure_is_reused_and_updated(self) -> None:
         existing = figure(width=250)
-        fig = self.df.bokeh.glyph(
+        fig = self.df.bokeh.plot(
             "scatter",
-            data={"x": "x", "y": "y"},
+            glyph_params={"x": "x", "y": "y"},
             figure=existing,
-            figure_kwargs={"title": "Updated"},
+            figure_params={"title": "Updated"},
         )
 
         self.assertIs(fig, existing)
         self.assertEqual(existing.title.text, "Updated")
         self.assertEqual(len(existing.renderers), 1)
 
-    def test_accepted_kwargs_apis(self) -> None:
-        fig_keys = self.df.bokeh.accepted_figure_kwargs()
-        glyph_keys = self.df.bokeh.accepted_glyph_kwargs(method="line")
-
+    def test_accepted_figure_params_api(self) -> None:
+        fig_keys = self.df.bokeh.accepted_figure_params()
         self.assertIsInstance(fig_keys, set)
-        self.assertIsInstance(glyph_keys, set)
         self.assertIn("title", fig_keys)
-        self.assertIn("line_width", glyph_keys)
 
-    def test_accepted_kwargs_pattern_filter_returns_sets(self) -> None:
-        fig_keys = self.df.bokeh.accepted_figure_kwargs(pattern="title")
-        glyph_keys = self.df.bokeh.accepted_glyph_kwargs(method="line", pattern="line_")
-
+    def test_accepted_figure_params_pattern_filter_returns_set(self) -> None:
+        fig_keys = self.df.bokeh.accepted_figure_params(pattern="title")
         self.assertIsInstance(fig_keys, set)
-        self.assertIsInstance(glyph_keys, set)
         self.assertTrue(fig_keys)
-        self.assertTrue(glyph_keys)
         self.assertTrue(all("title" in key for key in fig_keys))
-        self.assertTrue(all("line_" in key for key in glyph_keys))
 
 
 if __name__ == "__main__":
