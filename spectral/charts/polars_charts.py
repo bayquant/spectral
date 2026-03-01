@@ -89,7 +89,7 @@ class BokehAccessor:
     def __init__(self, df: pl.DataFrame):
         self._df = df
 
-    def glyph(
+    def plot(
         self,
         glyph: str,
         *,
@@ -97,7 +97,7 @@ class BokehAccessor:
         figure=None,
         figure_params: dict[str, Any] | None = None,
     ):
-        """Create a Bokeh chart using a direct figure glyph method."""
+        """Create a Bokeh chart using a direct figure plot method."""
         chart = BasePolarsChart(
             self._df,
             glyph=glyph,
