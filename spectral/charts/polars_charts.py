@@ -55,7 +55,6 @@ class BasePolarsChart:
 
     @staticmethod
     def _validate_glyph(glyph: str) -> None:
-        pass
         if not hasattr(figure(), glyph):
             raise ValueError(f"Unknown glyph '{glyph}'")
 
