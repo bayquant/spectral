@@ -40,6 +40,14 @@ class BasePolarsChart:
             return self._figure
         return figure(**self._figure_params)
 
+    def prepare_data(self) -> pl.DataFrame:
+        """Prepare default source-backed field mappings."""
+        if "x" not in self._glyph_params:
+            self._glyph_params["x"] = "__index"
+        if self._glyph_params.get("x") == "__index" and "__index" not in self._df.columns:
+            self._df = self._df.with_row_index(name="__index")
+        return self._df
+
     def add_glyph(self, figure: figure) -> None:
         glyph_method = getattr(figure, self.glyph)
         glyph_method(
@@ -48,7 +56,8 @@ class BasePolarsChart:
         )
 
     def build(self):
-        """Build the figure and add the glyph."""
+        """Prepare data, build the figure, and add the glyph."""
+        self.prepare_data()
         figure = self.build_figure()
         self.add_glyph(figure)
         return figure
