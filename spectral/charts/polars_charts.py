@@ -41,6 +41,10 @@ class BasePolarsChart:
         return figure(**self._figure_params)
 
     def prepare_data(self) -> pl.DataFrame:
+
+        # if accepts x and x not in params ...
+
+        # if accepts y and y not in params ...
         """Prepare default source-backed field mappings."""
         if "x" not in self._glyph_params:
             self._glyph_params["x"] = "__index"
