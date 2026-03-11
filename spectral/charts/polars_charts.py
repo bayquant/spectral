@@ -1,119 +1,103 @@
-"""Polars DataFrame -> Bokeh chart helpers."""
+from __future__ import annotations
+
+import warnings
+import polars as pl
+
+from bokeh.models import ColumnDataSource, glyphs
+from bokeh.plotting import figure
+from bokeh.plotting._decorators import glyph_method
+from bokeh.io import show
+from bokeh.models.renderers import GlyphRenderer
+from typing import Any
+from spectral.charts.theme_manager import theme
 
 from typing import Any
-
 import polars as pl
-from bokeh.plotting import figure
+from bokeh.io import show
+from bokeh.plotting._figure import FigureOptions
+from bokeh.plotting._plot import get_range, get_scale, process_axis_and_grid
+from bokeh.plotting._tools import process_active_tools, process_tools_arg
+from bokeh.models import Plot
+from bokeh.plotting._decorators import glyph_method
+from bokeh.models.renderers import GlyphRenderer
+from typing import Any
+from bokeh.models import glyphs
+from bokeh.models import ColumnDataSource
+from bokeh.util.warnings import BokehUserWarning
+
+warnings.simplefilter("ignore", BokehUserWarning)
 
 
-class BasePolarsChart:
-    """Build Bokeh charts from a Polars DataFrame using a direct figure glyph."""
+class Figure(Plot):
 
-    glyph: str
+    def __init__(self, *arg, **kw) -> None:
+        opts = FigureOptions(kw)
 
-    def __init__(
-        self,
-        df: pl.DataFrame,
-        *,
-        glyph: str,
-        glyph_params: dict[str, Any] | None = None,
-        figure=None,
-        figure_params: dict[str, Any] | None = None,
-    ):
-        self._df = df
-        self.glyph = glyph
-        self._figure = figure
-        self._glyph_params = glyph_params or {}
-        self._figure_params = figure_params or {}
-        self._validate_glyph(self.glyph)
-        self._validate_params(
-            name="figure_params",
-            values=self._figure_params,
-            accepted=self.accepted_figure_params(),
+        names = self.properties()
+        for name in kw.keys():
+            if name not in names:
+                self._raise_attribute_error_with_matches(name, names | opts.properties())
+
+        super().__init__(*arg, **kw)
+
+        self.x_range = get_range(opts.x_range)
+        self.y_range = get_range(opts.y_range)
+
+        self.x_scale = get_scale(self.x_range, opts.x_axis_type)
+        self.y_scale = get_scale(self.y_range, opts.y_axis_type)
+
+        process_axis_and_grid(self, opts.x_axis_type, opts.x_axis_location, opts.x_minor_ticks, opts.x_axis_label, self.x_range, 0)
+        process_axis_and_grid(self, opts.y_axis_type, opts.y_axis_location, opts.y_minor_ticks, opts.y_axis_label, self.y_range, 1)
+
+        tool_objs, tool_map = process_tools_arg(self, opts.tools, opts.tooltips)
+        self.add_tools(*tool_objs)
+        process_active_tools(
+            self.toolbar,
+            tool_map,
+            opts.active_drag,
+            opts.active_inspect,
+            opts.active_scroll,
+            opts.active_tap,
+            opts.active_multi,
         )
 
-    def build_figure(self) -> figure:
-        """Return the target figure, applying figure params to existing figures too."""
-        if self._figure is not None:
-            if self._figure_params:
-                self._figure.update(**self._figure_params)
-            return self._figure
-        return figure(**self._figure_params)
+    @property
+    def plot(self):
+        return self
 
-    def prepare_data(self) -> pl.DataFrame:
-
-        # if accepts x and x not in params ...
-
-        # if accepts y and y not in params ...
-        """Prepare default source-backed field mappings."""
-        if "x" not in self._glyph_params:
-            self._glyph_params["x"] = "__index"
-        if self._glyph_params.get("x") == "__index" and "__index" not in self._df.columns:
-            self._df = self._df.with_row_index(name="__index")
-        return self._df
-
-    def add_glyph(self, figure: figure) -> None:
-        glyph_method = getattr(figure, self.glyph)
-        glyph_method(
-            source=self._df,
-            **self._glyph_params,
-        )
-
-    def build(self):
-        """Prepare data, build the figure, and add the glyph."""
-        self.prepare_data()
-        figure = self.build_figure()
-        self.add_glyph(figure)
-        return figure
-
-    @staticmethod
-    def _validate_glyph(glyph: str) -> None:
-        if not hasattr(figure(), glyph):
-            raise ValueError(f"Unknown glyph '{glyph}'")
-
-    @staticmethod
-    def _validate_params(name: str, values: dict[str, Any], accepted: set[str]) -> None:
-        unknown = sorted(set(values) - accepted)
-        if not unknown:
-            return
-        unknown_text = ", ".join(unknown)
-        raise ValueError(
-            f"Unsupported {name}: {unknown_text}. "
-            f"Use `.accepted_{name}()` to inspect valid keys."
-        )
-
-    @staticmethod
-    def accepted_figure_params() -> set[str]:
-        """Get accepted params for bokeh.plotting.figure()."""
-        return set(figure().properties())
+    @property
+    def coordinates(self):
+        return None
 
 
-@pl.api.register_dataframe_namespace(name="bokeh")
-class BokehAccessor:
-    def __init__(self, df: pl.DataFrame):
+@pl.api.register_dataframe_namespace("bokeh")
+class BokehAccessor(Figure):
+
+    __view_model__ = "Figure"
+    __view_module__ = "bokeh.plotting.figure"
+
+    def __init__(self, df: pl.DataFrame) -> None:
         self._df = df
 
-    def plot(
-        self,
-        glyph: str,
-        *,
-        glyph_params: dict[str, Any] | None = None,
-        figure=None,
-        figure_params: dict[str, Any] | None = None,
-    ):
-        """Create a Bokeh chart using a direct figure plot method."""
-        chart = BasePolarsChart(
-            self._df,
-            glyph=glyph,
-            glyph_params=glyph_params,
-            figure=figure,
-            figure_params=figure_params,
-        )
-        return chart.build()
+    @property
+    def source(self) -> ColumnDataSource:
+        return ColumnDataSource(self._df.to_dict(as_series=False))
 
-    def accepted_figure_params(self, pattern: str = "") -> set[str]:
-        """Return accepted Bokeh figure property names for `figure_params`."""
-        params = BasePolarsChart.accepted_figure_params()
-        if pattern:
-            return {arg for arg in params if pattern in arg}
-        return params
+    def __call__(self, *args, **kwargs) -> "BokehAccessor":
+        super().__init__(*args, **kwargs)
+        return self.plot
+    
+    @glyph_method(glyphs.Line)
+    def _line(self, **kwargs: Any) -> GlyphRenderer:
+        raise NotImplementedError
+
+    def line(self, x: str, y: str, **kwargs):
+        return self._line(x=x, y=y, source=self.source, **kwargs)
+
+    
+if __name__ == "__main__":
+    theme.set("dark_minimal")
+    df = pl.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
+    fig = df.bokeh(title="My plot", width=700, height=300, tools="pan,wheel_zoom,reset")
+    fig.line("x", "y", line_width=2)
+    show(fig)
