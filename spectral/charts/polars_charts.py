@@ -86,11 +86,8 @@ class BokehAccessor(Figure):
         return self.plot
     
     @glyph_method(glyphs.Line)
-    def _line(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        raise NotImplementedError
-
-    def line(self, x: str, y: str, **kwargs):
-        return self._line(x, y, source=self.source, **kwargs)
+    def line(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
+        pass
 
     
 if __name__ == "__main__":
