@@ -15,7 +15,12 @@ def glyph_method(glyphclass):
         parameters = glyphclass.parameters()
 
         # TODO: send issue so that this signature only takes glyphclass.args instead of [x[0] for x in parameters]
-        sigparams = [Parameter("self", Parameter.POSITIONAL_OR_KEYWORD)] + [x[0] for x in parameters] + [Parameter("kwargs", Parameter.VAR_KEYWORD)]
+        sigparams = (
+            [Parameter("self", Parameter.POSITIONAL_OR_KEYWORD)]
+            + [x[0] for x in parameters]
+            + [Parameter("source", Parameter.KEYWORD_ONLY, default=None)]
+            + [Parameter("kwargs", Parameter.VAR_KEYWORD)]
+        )
 
         @wraps(func)
         def wrapped(self, *args, **kwargs):

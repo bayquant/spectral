@@ -2,26 +2,17 @@ from __future__ import annotations
 
 import warnings
 import polars as pl
+from typing import Any
 
-from bokeh.models import ColumnDataSource, glyphs
+from bokeh.io import show
 from ._decorators import glyph_method
-from bokeh.io import show
+from bokeh.models import ColumnDataSource, Plot, glyphs
 from bokeh.models.renderers import GlyphRenderer
-from typing import Any
-from spectral.charts.theme_manager import theme
-
-from typing import Any
-import polars as pl
-from bokeh.io import show
 from bokeh.plotting._figure import FigureOptions
 from bokeh.plotting._plot import get_range, get_scale, process_axis_and_grid
 from bokeh.plotting._tools import process_active_tools, process_tools_arg
-from bokeh.models import Plot
-from bokeh.models.renderers import GlyphRenderer
-from typing import Any
-from bokeh.models import glyphs
-from bokeh.models import ColumnDataSource
 from bokeh.util.warnings import BokehUserWarning
+from spectral.charts.theme_manager import theme
 
 warnings.simplefilter("ignore", BokehUserWarning)
 
@@ -79,7 +70,9 @@ class BokehAccessor(Figure):
 
     @property
     def source(self) -> ColumnDataSource:
-        return ColumnDataSource(self._df.to_dict(as_series=False))
+        if not hasattr(self, "_source"):
+            self._source = ColumnDataSource(self._df.to_dict(as_series=False))
+        return self._source
 
     def __call__(self, *args, **kwargs) -> "BokehAccessor":
         super().__init__(*args, **kwargs)
