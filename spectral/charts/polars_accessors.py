@@ -57,6 +57,3 @@ if __name__ == "__main__":
     fig.line(x="x", y="y", line_width=2)
     show(fig)
 
-
-__all__ = ["BokehAccessor"]
-

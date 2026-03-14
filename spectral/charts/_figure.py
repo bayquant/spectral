@@ -1,11 +1,4 @@
 #-----------------------------------------------------------------------------
-# Copyright (c) Anaconda, Inc., and Bokeh Contributors.
-# All rights reserved.
-#
-# The full license is in the file LICENSE.txt, distributed with this software.
-#-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
 # Boilerplate
 #-----------------------------------------------------------------------------
 from __future__ import annotations
@@ -16,7 +9,7 @@ from __future__ import annotations
 
 # Standard library imports
 
-# Bokeh imports
+# Other imports
 from bokeh.models import Plot
 from bokeh.plotting._figure import FigureOptions
 from bokeh.plotting._plot import get_range
