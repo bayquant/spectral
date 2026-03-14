@@ -4,8 +4,7 @@ import warnings
 import polars as pl
 
 from bokeh.models import ColumnDataSource, glyphs
-from bokeh.plotting import figure
-from bokeh.plotting._decorators import glyph_method
+from ._decorators import glyph_method
 from bokeh.io import show
 from bokeh.models.renderers import GlyphRenderer
 from typing import Any
@@ -18,7 +17,6 @@ from bokeh.plotting._figure import FigureOptions
 from bokeh.plotting._plot import get_range, get_scale, process_axis_and_grid
 from bokeh.plotting._tools import process_active_tools, process_tools_arg
 from bokeh.models import Plot
-from bokeh.plotting._decorators import glyph_method
 from bokeh.models.renderers import GlyphRenderer
 from typing import Any
 from bokeh.models import glyphs
@@ -88,16 +86,16 @@ class BokehAccessor(Figure):
         return self.plot
     
     @glyph_method(glyphs.Line)
-    def _line(self, **kwargs: Any) -> GlyphRenderer:
+    def _line(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         raise NotImplementedError
 
     def line(self, x: str, y: str, **kwargs):
-        return self._line(x=x, y=y, source=self.source, **kwargs)
+        return self._line(x, y, source=self.source, **kwargs)
 
     
 if __name__ == "__main__":
     theme.set("dark_minimal")
     df = pl.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
     fig = df.bokeh(title="My plot", width=700, height=300, tools="pan,wheel_zoom,reset")
-    fig.line("x", "y", line_width=2)
+    fig.line(x="x", y="y", line_width=2)
     show(fig)
