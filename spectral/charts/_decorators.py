@@ -1,11 +1,19 @@
+#-----------------------------------------------------------------------------
+# Boilerplate
+#-----------------------------------------------------------------------------
 from __future__ import annotations
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
 # Standard library imports
 from functools import wraps
-from inspect import Parameter, Signature, signature
+from inspect import Parameter
+from inspect import Signature
+from inspect import signature
 
-# Bokeh imports
-from bokeh.util.deprecation import deprecated
+# Other imports
 from bokeh.plotting._docstring import generate_docstring
 from bokeh.plotting._renderer import create_renderer
 

@@ -1,5 +1,6 @@
 import polars as pl
 
+
 @pl.api.register_expr_namespace("quant")
 class QuantNamespace:
     def __init__(self, expr: pl.Expr):
@@ -12,7 +13,7 @@ class QuantNamespace:
     ) -> pl.Expr:
         """
         Compute simple percentage return for the expression.
-        
+
         Parameters
         ----------
         periods : int
@@ -112,7 +113,7 @@ class QuantNamespace:
                 window_size=window_size,
                 min_periods=min_periods,
                 ddof=ddof
-            ) 
+            )
             / benchmark_col.rolling_var(
                 window_size=window_size,
                 min_periods=min_periods,
@@ -121,3 +122,4 @@ class QuantNamespace:
         )
 
         return expr.over(over).alias('rolling_beta') if over is not None else expr.alias('rolling_beta')
+
