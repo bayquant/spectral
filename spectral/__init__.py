@@ -6,7 +6,7 @@ load_dotenv(
     dotenv_path=Path(__file__).resolve().parent / ".env"
 )
 
-from .polars_quant_expressions import *
+from .quant.polars_accessors import *
 from . import data
 from . import charts
-
+from . import quant

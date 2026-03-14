@@ -3,7 +3,7 @@ import unittest
 import polars as pl
 from bokeh.plotting import figure
 
-from spectral.charts import polars_charts
+from spectral.charts import polars_accessors
 
 
 class TestPolarsBokehAccessor(unittest.TestCase):
