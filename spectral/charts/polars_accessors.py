@@ -49,6 +49,14 @@ class BokehAccessor(Figure):
     def line(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         pass
 
+    @glyph_method(glyphs.Scatter)
+    def scatter(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
+        pass
+
+    @glyph_method(glyphs.VArea)
+    def varea(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
+        pass
+
 
 if __name__ == "__main__":
     theme.set("dark_minimal")
