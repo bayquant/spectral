@@ -16,6 +16,9 @@ THEMES = {
     "ocean": Theme(
         json={
             "attrs": {
+                "Toolbar": {
+                    "logo": None
+                },
                 "Plot": {
                     "background_fill_color": "#e8e8ea",
                     "border_fill_color": "#e8e8ea",
