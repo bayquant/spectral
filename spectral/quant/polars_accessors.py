@@ -2,7 +2,7 @@ import polars as pl
 
 
 @pl.api.register_expr_namespace("quant")
-class QuantNamespace:
+class QuantAccessor:
     def __init__(self, expr: pl.Expr):
         self._expr = expr
 

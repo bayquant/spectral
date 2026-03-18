@@ -1,3 +1,5 @@
 from . import massive
 
-__all__ = ["massive"]
+__all__ = [
+    "massive"
+]

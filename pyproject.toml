@@ -8,6 +8,18 @@ version = "0.1.0"
 description = "Quant Research Library"
 readme = "README.md"
 requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "BayQuant" }
+]
+keywords = ["quant", "finance"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
 dependencies = [
     "bokeh==3.8.1",
     "massive>=2.0.2",
@@ -21,7 +33,11 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ipykernel>=7.0.1",
+    "black",
 ]
+
+[project.urls]
+Homepage = "https://github.com/bayquant/spectral"
 
 [tool.setuptools.packages.find]
 where = ["."]
