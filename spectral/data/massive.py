@@ -14,7 +14,7 @@ import os
 from ..utils.rate_limiter import RateLimiter
 
 client = RESTClient(
-    api_key=os.getenv("MASSIVE_API"), pagination=True, trace=False
+    api_key=os.getenv("MASSIVE_API_KEY", ""), pagination=True, trace=False
 )
 _rate_limiter = RateLimiter(calls=5, per_seconds=60)
 
