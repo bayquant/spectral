@@ -1,13 +1,9 @@
 #-----------------------------------------------------------------------------
-# Boilerplate
-#-----------------------------------------------------------------------------
-from __future__ import annotations
-
-#-----------------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------------
 
 # Standard library imports
+from __future__ import annotations
 import warnings
 from typing import Any
 
@@ -16,15 +12,21 @@ from bokeh.io import show
 from bokeh.models import ColumnDataSource
 from bokeh.models import glyphs
 from bokeh.models.renderers import GlyphRenderer
-import polars as pl
 from bokeh.util.warnings import BokehUserWarning
-
+import polars as pl
 from ._decorators import glyph_method
 from ._figure import Figure
 from spectral.charts.theme_manager import theme
 
+#-----------------------------------------------------------------------------
+# Globals and constants
+#-----------------------------------------------------------------------------
+
 warnings.simplefilter("ignore", BokehUserWarning)
 
+#-----------------------------------------------------------------------------
+# General API
+#-----------------------------------------------------------------------------
 
 @pl.api.register_dataframe_namespace("bokeh")
 class BokehAccessor(Figure):
@@ -200,6 +202,10 @@ class BokehAccessor(Figure):
     @glyph_method(glyphs.VStrip)
     def vstrip(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         pass
+
+#-----------------------------------------------------------------------------
+# Private API
+#-----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     theme.set("dark_minimal")

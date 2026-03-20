@@ -1,10 +1,24 @@
-from collections import deque
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
+
+# Standard library imports
 import time
+from collections import deque
 from typing import Deque
+
+# Other imports
 from .logger import get_logger
+
+#-----------------------------------------------------------------------------
+# Globals and constants
+#-----------------------------------------------------------------------------
 
 log = get_logger(name="rate_limiter")
 
+#-----------------------------------------------------------------------------
+# General API
+#-----------------------------------------------------------------------------
 
 class RateLimiter:
     """Simple token bucket style limiter"""
@@ -32,3 +46,7 @@ class RateLimiter:
             return
 
         self._hits.append(time.monotonic())
+
+#-----------------------------------------------------------------------------
+# Private API
+#-----------------------------------------------------------------------------

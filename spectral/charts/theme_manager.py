@@ -1,10 +1,20 @@
 """Central theme management for Bokeh apps."""
 
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
+
+# Standard library imports
 from __future__ import annotations
 
+# Other imports
 from bokeh.io import curdoc
-from bokeh.themes import Theme, built_in_themes
+from bokeh.themes import built_in_themes
+from bokeh.themes import Theme
 
+#-----------------------------------------------------------------------------
+# Globals and constants
+#-----------------------------------------------------------------------------
 
 THEMES = {
     "caliber": built_in_themes["caliber"],
@@ -91,6 +101,9 @@ THEMES = {
     ),
 }
 
+#-----------------------------------------------------------------------------
+# General API
+#-----------------------------------------------------------------------------
 
 class ThemeAccessor:
     """Small accessor around a named collection of Bokeh themes."""
@@ -117,3 +130,7 @@ class ThemeAccessor:
 
 # Global accessor for app/notebook code.
 theme = ThemeAccessor(default="light_minimal")
+
+#-----------------------------------------------------------------------------
+# Private API
+#-----------------------------------------------------------------------------

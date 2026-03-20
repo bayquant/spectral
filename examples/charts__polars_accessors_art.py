@@ -1,19 +1,25 @@
-"""Ocean-wave art example using methods on `pl.DataFrame.bokeh`.
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
-Run directly:
-    python examples/charts_polars_accessors.py
-"""
-
+# Standard library imports
 from __future__ import annotations
-
 import math
 
-import polars as pl
+# Other imports
 from bokeh.colors import groups
-from bokeh.io import output_file, show
-
+from bokeh.io import output_file
+from bokeh.io import show
+import polars as pl
 from spectral.charts.theme_manager import theme
 
+#-----------------------------------------------------------------------------
+# Globals and constants
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# General API
+#-----------------------------------------------------------------------------
 
 def build_data(points: int = 120) -> pl.DataFrame:
     x = list(range(points))
@@ -204,6 +210,9 @@ def build_art_plot() -> None:
 
     show(fig)
 
+#-----------------------------------------------------------------------------
+# Private API
+#-----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     build_art_plot()

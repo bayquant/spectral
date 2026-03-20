@@ -1,19 +1,34 @@
-import polars as pl
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
+
+# Standard library imports
 from typing import Dict
+
+# Other imports
+import polars as pl
+
+#-----------------------------------------------------------------------------
+# Globals and constants
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# General API
+#-----------------------------------------------------------------------------
 
 class Portfolio:
     def __init__(self, df: pl.DataFrame, portfolio: Dict, benchmark: str):
         """
         Portfolio analytics class for computing total, systematic, and idiosyncratic returns.
 
-        This class takes in a dataset of asset returns (including a benchmark) and a 
-        dictionary of portfolio weights, then computes the time series of portfolio-level 
+        This class takes in a dataset of asset returns (including a benchmark) and a
+        dictionary of portfolio weights, then computes the time series of portfolio-level
         returns and their decomposition into systematic and idiosyncratic components.
 
         Parameters
         ----------
         df : pl.DataFrame
-            Polars DataFrame containing asset and benchmark data. 
+            Polars DataFrame containing asset and benchmark data.
             Must include at least the following columns:
             - 'timestamp' : datetime
             - 'ticker' : str
@@ -61,3 +76,7 @@ class Portfolio:
         )
 
         return portfolio
+
+#-----------------------------------------------------------------------------
+# Private API
+#-----------------------------------------------------------------------------

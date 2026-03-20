@@ -1,13 +1,9 @@
 #-----------------------------------------------------------------------------
-# Boilerplate
-#-----------------------------------------------------------------------------
-from __future__ import annotations
-
-#-----------------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------------
 
 # Standard library imports
+from __future__ import annotations
 from functools import wraps
 from inspect import Parameter
 from inspect import Signature
@@ -17,6 +13,13 @@ from inspect import signature
 from bokeh.plotting._docstring import generate_docstring
 from bokeh.plotting._renderer import create_renderer
 
+#-----------------------------------------------------------------------------
+# Globals and constants
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# General API
+#-----------------------------------------------------------------------------
 
 def glyph_method(glyphclass):
     def decorator(func):
@@ -64,3 +67,7 @@ def glyph_method(glyphclass):
         return wrapped
 
     return decorator
+
+#-----------------------------------------------------------------------------
+# Private API
+#-----------------------------------------------------------------------------
