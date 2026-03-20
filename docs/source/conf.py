@@ -40,3 +40,4 @@ napoleon_include_init_with_doc = True
 
 html_theme = "furo"
 html_static_path = ["_static"]
+html_baseurl = "https://bayquant.github.io/spectral/"
