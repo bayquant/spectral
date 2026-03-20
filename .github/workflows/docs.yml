@@ -2,13 +2,8 @@ name: Docs
 
 on:
   push:
-<<<<<<< Updated upstream
-    branches:
-      - main
-=======
     tags:
       - "v*"
->>>>>>> Stashed changes
   workflow_dispatch:
 
 permissions:

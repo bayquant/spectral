@@ -1,4 +1,4 @@
-Spectral
+Xpectral
 ========
 
 Quantitative research library extending Polars DataFrames with charting and financial analytics.

@@ -16,7 +16,7 @@ from bokeh.util.warnings import BokehUserWarning
 import polars as pl
 from ._decorators import glyph_method
 from ._figure import Figure
-from spectral.charts.theme_manager import theme
+from xpectral.charts.theme_manager import theme
 
 #-----------------------------------------------------------------------------
 # Globals and constants

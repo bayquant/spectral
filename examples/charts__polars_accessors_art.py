@@ -11,7 +11,7 @@ from bokeh.colors import groups
 from bokeh.io import output_file
 from bokeh.io import show
 import polars as pl
-from spectral.charts.theme_manager import theme
+from xpectral.charts.theme_manager import theme
 
 #-----------------------------------------------------------------------------
 # Globals and constants
