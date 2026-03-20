@@ -32,8 +32,12 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ipykernel>=7.0.1",
     "black",
+    "ipykernel>=7.0.1",
+    "furo>=2024.0",
+    "myst-parser>=3.0",
+    "sphinx>=8.0",
+    "sphinx-autodoc-typehints>=2.0",
 ]
 
 [project.urls]
