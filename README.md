@@ -1,5 +1,7 @@
 # Spectral
 
+![Spectral decomposition](assets/spectral_banner.gif)
+
 A quantitative research library that extends **Polars** DataFrames with charting and financial analytics.
 
 ## Modules
