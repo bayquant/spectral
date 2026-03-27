@@ -26,15 +26,15 @@ __all__ = ["Figure"]
 
 class Figure(Plot):
 
-    def __init__(self, *arg, **kw) -> None:
-        opts = FigureOptions(kw)
+    def __init__(self, *arg, **kwargs) -> None:
+        opts = FigureOptions(kwargs)
 
         names = self.properties()
-        for name in kw.keys():
+        for name in kwargs.keys():
             if name not in names:
                 self._raise_attribute_error_with_matches(name, names | opts.properties())
 
-        super().__init__(*arg, **kw)
+        super().__init__(*arg, **kwargs)
 
         self.x_range = get_range(opts.x_range)
         self.y_range = get_range(opts.y_range)

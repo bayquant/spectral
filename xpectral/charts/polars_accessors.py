@@ -8,15 +8,15 @@ import warnings
 from typing import Any
 
 # Other imports
-from bokeh.io import show
 from bokeh.models import ColumnDataSource
 from bokeh.models import glyphs
 from bokeh.models.renderers import GlyphRenderer
+from bokeh.plotting._stack import double_stack
+from bokeh.plotting._stack import single_stack
 from bokeh.util.warnings import BokehUserWarning
 import polars as pl
 from ._decorators import glyph_method
 from ._figure import Figure
-from xpectral.charts.theme_manager import theme
 
 #-----------------------------------------------------------------------------
 # Globals and constants
@@ -47,6 +47,7 @@ class BokehAccessor(Figure):
         super().__init__(*args, **kwargs)
         return self.plot
 
+    #-------------------------------------------
     # Glyph methods with both x and y parameters
     @glyph_method(glyphs.AnnularWedge)
     def annular_wedge(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
@@ -128,6 +129,7 @@ class BokehAccessor(Figure):
     def wedge(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         pass
 
+    #----------------------------------------------------
     # Vertical glyph methods (have parameter x but not y)
     @glyph_method(glyphs.VArea)
     def varea(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
@@ -145,6 +147,7 @@ class BokehAccessor(Figure):
     def vspan(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         pass
 
+    #------------------------------------------------------
     # Horizontal glyph methods (have parameter y but not x)
     @glyph_method(glyphs.HArea)
     def harea(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
@@ -162,6 +165,7 @@ class BokehAccessor(Figure):
     def hspan(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         pass
 
+    #-----------------------------------------
     # Glyph methods without x nor y parameters
     @glyph_method(glyphs.Bezier)
     def bezier(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
@@ -203,13 +207,50 @@ class BokehAccessor(Figure):
     def vstrip(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
         pass
 
+    #-----------------------------------------
+    # Glyph stack methods 
+    def harea_stack(self, stackers: list[str], **kwargs: Any) -> list[GlyphRenderer]:
+        result = []
+        for kwarg in double_stack(stackers=stackers, spec0="x1", spec1="x2", **kwargs):
+            result.append(self.harea(**kwarg))
+        return result
+
+    def hbar_stack(self, stackers: list[str], **kwargs: Any) -> list[GlyphRenderer]:
+        result = []
+        for kwarg in double_stack(stackers=stackers, spec0="left", spec1="right", **kwargs):
+            result.append(self.hbar(**kwarg))
+        return result
+
+    def hline_stack(self, stackers: list[str], **kwargs: Any) -> list[GlyphRenderer]:
+        result = []
+        for kwarg in single_stack(stackers=stackers, spec="x", **kwargs):
+            result.append(self.line(**kwarg))
+        return result
+
+    def varea_stack(self, stackers: list[str], **kwargs: Any) -> list[GlyphRenderer]:
+        result = []
+        for kwarg in double_stack(stackers=stackers, spec0="y1", spec1="y2", **kwargs):
+            result.append(self.varea(**kwarg))
+        return result
+
+    def vbar_stack(self, stackers: list[str], **kwargs: Any) -> list[GlyphRenderer]:
+        result = []
+        for kwarg in double_stack(stackers=stackers, spec0="bottom", spec1="top", **kwargs):
+            result.append(self.vbar(**kwarg))
+        return result
+
+    def vline_stack(self, stackers: list[str], **kwargs: Any) -> list[GlyphRenderer]:
+        result = []
+        for kwarg in single_stack(stackers=stackers, spec="y", **kwargs):
+            result.append(self.line(**kwarg))
+        return result
+
 #-----------------------------------------------------------------------------
 # Private API
 #-----------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    theme.set("dark_minimal")
-    df = pl.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
-    fig = df.bokeh(title="My plot", width=700, height=300, tools="pan,wheel_zoom,reset")
-    fig.line(x="x", y="y", line_width=2)
-    show(fig)
+# Polars' NameSpace descriptor caches the accessor on the DataFrame instance
+# via setattr, causing the same BokehAccessor to be returned on repeated
+# accesses of df.bokeh. Replacing the descriptor with a non-caching property
+# ensures each access produces a fresh instance.
+pl.DataFrame.bokeh = property(lambda self: BokehAccessor(self))  # type: ignore[assignment]
