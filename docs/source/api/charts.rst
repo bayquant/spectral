@@ -1,9 +1,9 @@
 xpectral.charts
 ===============
 
-Bokeh visualization accessor registered on Polars DataFrames as ``df.bokeh``.
+Bokeh visualization accessor registered on Polars and pandas DataFrames as ``df.bokeh``.
 
-.. automodule:: xpectral.charts.polars_accessors
+.. automodule:: xpectral.charts.accessors
    :members:
    :undoc-members:
    :show-inheritance:

@@ -5,13 +5,17 @@
 # Standard library imports
 
 # Other imports
-from .polars_accessors import BokehAccessor
-from .polars_accessors import Figure
+from .accessors import BokehAccessor
+from .accessors import Figure
+from .accessors import PandasBokehAccessor
+from .accessors import PolarsBokehAccessor
 
 #-----------------------------------------------------------------------------
 # Globals and constants
 #-----------------------------------------------------------------------------
 
 __all__ = [
-    "BokehAccessor"
+    "BokehAccessor",
+    "PandasBokehAccessor",
+    "PolarsBokehAccessor",
 ]

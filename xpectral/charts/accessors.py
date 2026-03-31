@@ -14,6 +14,7 @@ from bokeh.models.renderers import GlyphRenderer
 from bokeh.plotting._stack import double_stack
 from bokeh.plotting._stack import single_stack
 from bokeh.util.warnings import BokehUserWarning
+import pandas as pd
 import polars as pl
 from ._decorators import glyph_method
 from ._figure import Figure
@@ -28,20 +29,10 @@ warnings.simplefilter("ignore", BokehUserWarning)
 # General API
 #-----------------------------------------------------------------------------
 
-@pl.api.register_dataframe_namespace("bokeh")
 class BokehAccessor(Figure):
 
-    __view_model__ = "Figure"
-    __view_module__ = "bokeh.plotting.figure"
-
-    def __init__(self, df: pl.DataFrame) -> None:
+    def __init__(self, df) -> None:
         self._df = df
-
-    @property
-    def source(self) -> ColumnDataSource:
-        if not hasattr(self, "_source"):
-            self._source = ColumnDataSource(self._df.to_dict(as_series=False))
-        return self._source
 
     def __call__(self, *args, **kwargs) -> "BokehAccessor":
         super().__init__(*args, **kwargs)
@@ -245,6 +236,32 @@ class BokehAccessor(Figure):
             result.append(self.line(**kwarg))
         return result
 
+
+@pl.api.register_dataframe_namespace("bokeh")
+class PolarsBokehAccessor(BokehAccessor):
+
+    __view_model__ = "Figure"
+    __view_module__ = "bokeh.plotting.figure"
+
+    @property
+    def source(self) -> ColumnDataSource:
+        if not hasattr(self, "_source"):
+            self._source = ColumnDataSource(self._df.to_dict(as_series=False))
+        return self._source
+    
+@pd.api.extensions.register_dataframe_accessor("bokeh")
+class PandasBokehAccessor(BokehAccessor):
+
+    __view_model__ = "Figure"
+    __view_module__ = "bokeh.plotting.figure"
+
+    @property
+    def source(self) -> ColumnDataSource:
+        if not hasattr(self, "_source"):
+            self._source = ColumnDataSource(self._df.to_dict(orient="list"))
+        return self._source
+
+
 #-----------------------------------------------------------------------------
 # Private API
 #-----------------------------------------------------------------------------
@@ -253,4 +270,4 @@ class BokehAccessor(Figure):
 # via setattr, causing the same BokehAccessor to be returned on repeated
 # accesses of df.bokeh. Replacing the descriptor with a non-caching property
 # ensures each access produces a fresh instance.
-pl.DataFrame.bokeh = property(lambda self: BokehAccessor(self))  # type: ignore[assignment]
+pl.DataFrame.bokeh = property(lambda self: PolarsBokehAccessor(self))  # type: ignore[assignment]
