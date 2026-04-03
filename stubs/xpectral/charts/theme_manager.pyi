@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+
+THEMES: Incomplete
+
+class ThemeAccessor:
+    def __init__(self, default: str = 'light') -> None: ...
+    @property
+    def name(self) -> str: ...
+    @property
+    def current(self): ...
+    def set(self, name: str) -> None: ...
+
+theme: Incomplete
