@@ -241,8 +241,8 @@ class BokehAccessor(Figure):
 @pl.api.register_dataframe_namespace("bokeh")
 class PolarsBokehAccessor(BokehAccessor):
 
-    __view_model__ = "Figure"  # type: ignore[misc]
-    __view_module__ = "bokeh.plotting.figure"  # type: ignore[misc]
+    __view_model__ = "Figure"
+    __view_module__ = "bokeh.plotting.figure"
 
     @property
     def source(self) -> ColumnDataSource:
@@ -253,8 +253,8 @@ class PolarsBokehAccessor(BokehAccessor):
 @pd.api.extensions.register_dataframe_accessor("bokeh")
 class PandasBokehAccessor(BokehAccessor):
 
-    __view_model__ = "Figure"  # type: ignore[misc]
-    __view_module__ = "bokeh.plotting.figure"  # type: ignore[misc]
+    __view_model__ = "Figure"
+    __view_module__ = "bokeh.plotting.figure"
 
     @property
     def source(self) -> ColumnDataSource:

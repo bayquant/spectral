@@ -1,25 +1,29 @@
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # Standard library imports
 from __future__ import annotations
 import math
+from typing import cast
 
 # Other imports
 from bokeh.colors import groups
 from bokeh.io import output_file
 from bokeh.io import show
 import polars as pl
+from xpectral import PolarsBokehAccessor
+from xpectral import PolarsDataFrame
 from xpectral.charts.theme_manager import theme
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Globals and constants
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # General API
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 def build_data(points: int = 120) -> pl.DataFrame:
     x = list(range(points))
@@ -42,8 +46,12 @@ def build_data(points: int = 120) -> pl.DataFrame:
             "y": base,
             "surface": surface,
             "surface2": surface2,
-            "depth_low": [value - 2.6 - math.sin(i / 2.4) * 0.8 for i, value in enumerate(base)],
-            "depth_high": [value + 3.6 + math.cos(i / 2.2) * 1.1 for i, value in enumerate(base)],
+            "depth_low": [
+                value - 2.6 - math.sin(i / 2.4) * 0.8 for i, value in enumerate(base)
+            ],
+            "depth_high": [
+                value + 3.6 + math.cos(i / 2.2) * 1.1 for i, value in enumerate(base)
+            ],
             "wave_width": [0.72 + (i % 7) * 0.015 for i in x],
             "ripple": [2.0 + ((i + 4) % 7) * 0.03 for i in x],
             "left": [i - 0.38 for i in x],
@@ -60,10 +68,12 @@ def build_data(points: int = 120) -> pl.DataFrame:
 
 def build_art_plot() -> None:
     theme.set("ocean")
-    output_file("charts_polars_accessors_ocean_waves.html", title="Accessor Ocean Waves")
+    output_file(
+        "charts_polars_accessors_ocean_waves.html", title="Accessor Ocean Waves"
+    )
 
-    df = build_data()
-    fig = df.bokeh(
+    df = cast(PolarsDataFrame, build_data())
+    fig: PolarsBokehAccessor = df.bokeh(
         title="Ocean Waves",
         width=1000,
         height=560,
@@ -210,9 +220,10 @@ def build_art_plot() -> None:
 
     show(fig)
 
-#-----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 # Private API
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
     build_art_plot()
