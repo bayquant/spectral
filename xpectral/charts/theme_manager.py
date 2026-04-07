@@ -1,8 +1,8 @@
 """Central theme management for Bokeh apps."""
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # Standard library imports
 from __future__ import annotations
@@ -12,9 +12,9 @@ from bokeh.io import curdoc
 from bokeh.themes import built_in_themes
 from bokeh.themes import Theme
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Globals and constants
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 THEMES = {
     "caliber": built_in_themes["caliber"],
@@ -26,9 +26,7 @@ THEMES = {
     "ocean": Theme(
         json={
             "attrs": {
-                "Toolbar": {
-                    "logo": None
-                },
+                "Toolbar": {"logo": None},
                 "Plot": {
                     "background_fill_color": "#e8e8ea",
                     "border_fill_color": "#e8e8ea",
@@ -53,7 +51,7 @@ THEMES = {
                     "major_label_text_color": "#4d4d4d",
                     "major_label_text_font": "Helvetica",
                     "major_label_text_font_size": "1.025em",
-                    "axis_label_standoff": 18,
+                    "axis_label_standoff": 5,
                     "axis_label_text_color": "#6b7ab0",
                     "axis_label_text_font": "Helvetica",
                     "axis_label_text_font_size": "1.25em",
@@ -101,9 +99,10 @@ THEMES = {
     ),
 }
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # General API
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 class ThemeAccessor:
     """Small accessor around a named collection of Bokeh themes."""
@@ -131,6 +130,6 @@ class ThemeAccessor:
 # Global accessor for app/notebook code.
 theme = ThemeAccessor(default="light_minimal")
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Private API
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

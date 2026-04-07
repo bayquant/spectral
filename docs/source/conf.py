@@ -11,12 +11,13 @@ sys.path.insert(0, os.path.abspath("../.."))
 project = "Xpectral"
 copyright = "2026, BayQuant"
 author = "BayQuant"
-release = "0.1.0"
+release = "1.0.2"
 
 # -- General configuration ---------------------------------------------------
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
