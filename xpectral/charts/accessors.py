@@ -200,38 +200,120 @@ class BokehAccessor(Figure):
         ...
 
     #-----------------------------------------
-    # Glyph stack methods 
+    # Glyph stack methods
     def harea_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+        """Stack horizontal filled areas between consecutive stacker columns.
+
+        Each stacker column is cumulated left-to-right: the running total
+        before the current stacker becomes ``x1`` and after becomes ``x2``,
+        producing one filled band per stacker.
+
+        Args:
+            stackers: Column names to stack in order.
+            **kwargs: Visual properties forwarded to :meth:`harea`
+                (e.g. ``y``, ``fill_color``, ``fill_alpha``).
+
+        Returns:
+            One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
+        """
         result = []
         for kwarg in double_stack(stackers=stackers, spec0="x1", spec1="x2", **kwargs):
             result.append(self.harea(**kwarg))
         return result
 
     def hbar_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+        """Stack horizontal bars between consecutive stacker columns.
+
+        Each stacker column is cumulated left-to-right: the running total
+        before the current stacker becomes ``left`` and after becomes ``right``,
+        producing one bar segment per stacker.
+
+        Args:
+            stackers: Column names to stack in order.
+            **kwargs: Visual properties forwarded to :meth:`hbar`
+                (e.g. ``y``, ``height``, ``fill_color``).
+
+        Returns:
+            One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
+        """
         result = []
         for kwarg in double_stack(stackers=stackers, spec0="left", spec1="right", **kwargs):
             result.append(self.hbar(**kwarg))
         return result
 
     def hline_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+        """Stack horizontal lines at the cumulative sum of each stacker column.
+
+        Each stacker column is cumulated left-to-right and the running total
+        is used as the ``x`` coordinate, producing one line per stacker.
+
+        Args:
+            stackers: Column names to stack in order.
+            **kwargs: Visual properties forwarded to :meth:`line`
+                (e.g. ``y``, ``line_color``, ``line_width``).
+
+        Returns:
+            One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
+        """
         result = []
         for kwarg in single_stack(stackers=stackers, spec="x", **kwargs):
             result.append(self.line(**kwarg))
         return result
 
     def varea_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+        """Stack vertical filled areas between consecutive stacker columns.
+
+        Each stacker column is cumulated bottom-to-top: the running total
+        before the current stacker becomes ``y1`` and after becomes ``y2``,
+        producing one filled band per stacker.
+
+        Args:
+            stackers: Column names to stack in order.
+            **kwargs: Visual properties forwarded to :meth:`varea`
+                (e.g. ``x``, ``fill_color``, ``fill_alpha``).
+
+        Returns:
+            One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
+        """
         result = []
         for kwarg in double_stack(stackers=stackers, spec0="y1", spec1="y2", **kwargs):
             result.append(self.varea(**kwarg))
         return result
 
     def vbar_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+        """Stack vertical bars between consecutive stacker columns.
+
+        Each stacker column is cumulated bottom-to-top: the running total
+        before the current stacker becomes ``bottom`` and after becomes ``top``,
+        producing one bar segment per stacker.
+
+        Args:
+            stackers: Column names to stack in order.
+            **kwargs: Visual properties forwarded to :meth:`vbar`
+                (e.g. ``x``, ``width``, ``fill_color``).
+
+        Returns:
+            One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
+        """
         result = []
         for kwarg in double_stack(stackers=stackers, spec0="bottom", spec1="top", **kwargs):
             result.append(self.vbar(**kwarg))
         return result
 
     def vline_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+        """Stack vertical lines at the cumulative sum of each stacker column.
+
+        Each stacker column is cumulated bottom-to-top and the running total
+        is used as the ``y`` coordinate, producing one line per stacker.
+
+        Args:
+            stackers: Column names to stack in order.
+            **kwargs: Visual properties forwarded to :meth:`line`
+                (e.g. ``x``, ``line_color``, ``line_width``).
+
+        Returns:
+            One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
+        """
         result = []
         for kwarg in single_stack(stackers=stackers, spec="y", **kwargs):
             result.append(self.line(**kwarg))
