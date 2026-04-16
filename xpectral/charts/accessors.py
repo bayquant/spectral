@@ -1,11 +1,12 @@
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Imports
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # Standard library imports
 from __future__ import annotations
 import warnings
 from typing import Any
+from typing import Callable
 from typing import Sequence
 
 # Other imports
@@ -20,15 +21,16 @@ import polars as pl
 from ._decorators import glyph_method
 from ._figure import Figure
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Globals and constants
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 warnings.simplefilter("ignore", BokehUserWarning)
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # General API
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 class BokehAccessor(Figure):
 
@@ -39,169 +41,163 @@ class BokehAccessor(Figure):
         super().__init__(*args, **kwargs)
         return self.plot
 
-    #-------------------------------------------
+    @classmethod
+    def register(cls, func: Callable[..., Any]) -> Callable[..., Any]:
+        """Register a function as a method on the accessor.
+
+        Use as a decorator to add custom chart methods to all
+        ``BokehAccessor`` subclasses (both Pandas and Polars variants).
+        The decorated function's first parameter must be ``self`` — the
+        accessor instance — which exposes ``self._df``, ``self.source``,
+        ``self.plot``, and every built-in glyph method.
+
+        Args:
+            func: Function to register.  Its first argument must be
+                ``self`` (the accessor instance).
+
+        Returns:
+            The original function, unchanged.
+
+        Example::
+
+            @BokehAccessor.register
+            def candlestick(self, open, high, low, close, **kwargs):
+                mid = (open + close) / 2
+                self.segment(x0=self._df["date"], y0=high,
+                             x1=self._df["date"], y1=low, **kwargs)
+                return self.rect(x="date", y=mid, width=0.5,
+                                 height=abs(close - open), **kwargs)
+        """
+        setattr(cls, func.__name__, func)
+        return func
+
+    # -------------------------------------------
     # Glyph methods with both x and y parameters
     @glyph_method(glyphs.AnnularWedge)
-    def annular_wedge(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def annular_wedge(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Annulus)
-    def annulus(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def annulus(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Arc)
-    def arc(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def arc(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Block)
-    def block(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def block(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Ellipse)
-    def ellipse(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def ellipse(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Image)
-    def image(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def image(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.ImageRGBA)
-    def image_rgba(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def image_rgba(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.ImageStack)
-    def image_stack(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def image_stack(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.ImageURL)
-    def image_url(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def image_url(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Line)
-    def line(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def line(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.MathMLGlyph)
-    def mathml_glyph(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def mathml_glyph(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Ngon)
-    def ngon(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def ngon(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Patch)
-    def patch(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def patch(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Ray)
-    def ray(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def ray(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Rect)
-    def rect(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def rect(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Scatter)
-    def scatter(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def scatter(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Step)
-    def step(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def step(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.TeXGlyph)
-    def tex_glyph(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def tex_glyph(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Text)
-    def text(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def text(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Wedge)
-    def wedge(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def wedge(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
-    #----------------------------------------------------
+    # ----------------------------------------------------
     # Vertical glyph methods (have parameter x but not y)
     @glyph_method(glyphs.VArea)
-    def varea(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def varea(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.VAreaStep)
-    def varea_step(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def varea_step(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.VBar)
-    def vbar(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def vbar(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.VSpan)
-    def vspan(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def vspan(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
-    #------------------------------------------------------
+    # ------------------------------------------------------
     # Horizontal glyph methods (have parameter y but not x)
     @glyph_method(glyphs.HArea)
-    def harea(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def harea(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.HAreaStep)
-    def harea_step(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def harea_step(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.HBar)
-    def hbar(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def hbar(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.HSpan)
-    def hspan(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def hspan(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
-    #-----------------------------------------
+    # -----------------------------------------
     # Glyph methods without x nor y parameters
     @glyph_method(glyphs.Bezier)
-    def bezier(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def bezier(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.HStrip)
-    def hstrip(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def hstrip(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.HexTile)
-    def hextile(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def hextile(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.MultiLine)
-    def multi_line(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def multi_line(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.MultiPolygons)
-    def multipolygons(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def multipolygons(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Patches)
-    def patches(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def patches(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Quad)
-    def quad(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def quad(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Quadratic)
-    def quadratic(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def quadratic(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.Segment)
-    def segment(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def segment(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
     @glyph_method(glyphs.VStrip)
-    def vstrip(self, *args: Any, **kwargs: Any) -> GlyphRenderer:
-        ...
+    def vstrip(self, *args: Any, **kwargs: Any) -> GlyphRenderer: ...
 
-    #-----------------------------------------
+    # -----------------------------------------
     # Glyph stack methods
-    def harea_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+    def harea_stack(
+        self, stackers: Sequence[str], **kwargs: Any
+    ) -> list[GlyphRenderer]:
         """Stack horizontal filled areas between consecutive stacker columns.
 
         Each stacker column is cumulated left-to-right: the running total
@@ -237,11 +233,15 @@ class BokehAccessor(Figure):
             One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
         """
         result = []
-        for kwarg in double_stack(stackers=stackers, spec0="left", spec1="right", **kwargs):
+        for kwarg in double_stack(
+            stackers=stackers, spec0="left", spec1="right", **kwargs
+        ):
             result.append(self.hbar(**kwarg))
         return result
 
-    def hline_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+    def hline_stack(
+        self, stackers: Sequence[str], **kwargs: Any
+    ) -> list[GlyphRenderer]:
         """Stack horizontal lines at the cumulative sum of each stacker column.
 
         Each stacker column is cumulated left-to-right and the running total
@@ -260,7 +260,9 @@ class BokehAccessor(Figure):
             result.append(self.line(**kwarg))
         return result
 
-    def varea_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+    def varea_stack(
+        self, stackers: Sequence[str], **kwargs: Any
+    ) -> list[GlyphRenderer]:
         """Stack vertical filled areas between consecutive stacker columns.
 
         Each stacker column is cumulated bottom-to-top: the running total
@@ -296,11 +298,15 @@ class BokehAccessor(Figure):
             One :class:`~bokeh.models.renderers.GlyphRenderer` per stacker.
         """
         result = []
-        for kwarg in double_stack(stackers=stackers, spec0="bottom", spec1="top", **kwargs):
+        for kwarg in double_stack(
+            stackers=stackers, spec0="bottom", spec1="top", **kwargs
+        ):
             result.append(self.vbar(**kwarg))
         return result
 
-    def vline_stack(self, stackers: Sequence[str], **kwargs: Any) -> list[GlyphRenderer]:
+    def vline_stack(
+        self, stackers: Sequence[str], **kwargs: Any
+    ) -> list[GlyphRenderer]:
         """Stack vertical lines at the cumulative sum of each stacker column.
 
         Each stacker column is cumulated bottom-to-top and the running total
@@ -331,7 +337,8 @@ class PolarsBokehAccessor(BokehAccessor):
         if not hasattr(self, "_source"):
             self._source = ColumnDataSource(self._df.to_dict(as_series=False))
         return self._source
-    
+
+
 @pd.api.extensions.register_dataframe_accessor("bokeh")
 class PandasBokehAccessor(BokehAccessor):
 
@@ -345,9 +352,9 @@ class PandasBokehAccessor(BokehAccessor):
         return self._source
 
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Private API
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # Polars' NameSpace descriptor caches the accessor on the DataFrame instance
 # via setattr, causing the same BokehAccessor to be returned on repeated
